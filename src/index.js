@@ -1,5 +1,6 @@
 const { MongoClient, ServerApiVersion } = require('mongodb')
 const TelegramBot = require('node-telegram-bot-api')
+const nodemailer = require('nodemailer')
 
 const {
     global: { mongoToken, telegramToken },
@@ -120,9 +121,7 @@ const onKeyboardHandler = async (id, code, additional) => {
         case 'repair': {
             order.service = code
             order.product = additional
-            await telegramBot.sendMessage(id, 'Оставьте свой номер телефона, менеджер свяжется с вами в ближайшее время', phoneKeyboard);
-            order.service = ''
-            order.product = undefined
+            await telegramBot.sendMessage(id, 'Оставьте свой номер телефона, менеджер свяжется с вами в ближайшее время', phoneKeyboard)
             break
         }
         default: {
@@ -134,13 +133,17 @@ const onKeyboardHandler = async (id, code, additional) => {
 const onPhoneHandler = async (id, contact) => {
     if (contact) {
         try {
-            await putOrder({
+            const form = {
                 name: contact.first_name,
                 phone: contact.phone_number,
                 service: order.service,
                 product: order.product
-            })
+            }
+            await putOrder(form)
             await telegramBot.sendMessage(id, contact.first_name + ', спасибо за оформленный заказ! Ожидайте звонка менеджера')
+            order.service = ''
+            order.product = undefined
+            sendEmail(form)
         } catch (err) {
             throw new Error(err)
         }
@@ -180,6 +183,33 @@ const putOrder = async (data) => {
     } catch (err) {
         throw new Error(err)
     }
+}
+
+const sendEmail = (form) => {
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.mail.ru',
+        port: 465,
+        secure: true,
+        auth: {
+            user: 'danchoo19@bk.ru',
+            pass: 'pVhKv44zbZburd7CF3zg'
+        }
+    })
+
+    const mailOptions = {
+        from: 'danchoo19@bk.ru',
+        to: 'danilakislov229@mail.ru',
+        subject: form.product ? 'Оформление заказа на товар' : 'Оформление заявки на ремонт',
+        text: `Имя: ${form.name}\nНомер телефона: ${form.phone}\nУслуга: ${form.service === 'repair' ? 'Ремонт' : form.service === 'diagnostic' ? 'Диагностика' : 'Оформление заказа на товар'}\n${form.product ? 'Товар: ' + form.product : ''}`
+    }
+
+    transporter.sendMail(mailOptions, (err, info) => {
+        if (err) {
+            console.log(err)
+        } else {
+            console.log('Email sent: ' + info.response)
+        }
+    })
 }
 
 init()
