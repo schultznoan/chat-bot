@@ -4,6 +4,7 @@
   "description": "chat bot puzzle",
   "main": "index.js",
   "scripts": {
+    "babel-node": "babel-node src/index.js",
     "dev": "nodemon src/index.js",
     "start": "node src/index.js"
   },
