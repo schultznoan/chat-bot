@@ -8,8 +8,8 @@ const answers = {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [
-                    { text: 'Товары', callback_data: JSON.stringify({ code: 'products', children: null }) },
-                    { text: 'Услуги', callback_data: JSON.stringify({ code: 'service', children: null }) }
+                    { text: 'Товары', callback_data: 'products.' },
+                    { text: 'Услуги', callback_data: 'service.' }
                 ]
             ]
         })
@@ -18,11 +18,24 @@ const answers = {
         reply_markup: JSON.stringify({
             inline_keyboard: [
                 [
-                    { text: 'Диагностика', callback_data: JSON.stringify({ code: 'diagnostic', children: null }) },
-                    { text: 'Ремонт', callback_data: JSON.stringify({ code: 'repair', children: null }) }
+                    { text: 'Диагностика', callback_data: 'diagnostic.' },
+                    { text: 'Ремонт', callback_data: 'repair.' }
                 ]
             ]
         })
+    },
+    phoneKeyboard: {
+        reply_markup: {
+            keyboard: [
+                [
+                    { text: 'Отправить номер телефона', request_contact: true }
+                ],
+                [
+                    { text: 'Отмена заказа' }
+                ]
+            ],
+            one_time_keyboard: true
+        }
     },
     defaultError: 'Извини, я тебя не понял! Воспользуйся командой /help для помощи по взаимодействию со мной!'
 }
