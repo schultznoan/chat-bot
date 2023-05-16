@@ -30,7 +30,7 @@ const init = async () => {
         { command: '/contacts', description: 'Информация о чат-боте' }
     ])
 
-    telegramBot.on('message', async (msg) => {
+    telegramBot.on('message', async ({ chat: { id }, text }) => {
         await onMessageHandler(id, text)
     })
 
